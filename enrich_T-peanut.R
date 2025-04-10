@@ -1,4 +1,4 @@
-# Title: enrich_T-peanut.R
+# Title: enrich.R
 # Date: 2025-04-10
 library(ggplot2)
 library(tidyverse)
@@ -8,38 +8,22 @@ library(org.Ahypogaea.eg.db)
 length(keys(org.Ahypogaea.eg.db))
 library(tidyverse)
 library(optparse)
+
 option_list <- list(
-  make_option(c("--gene_csv"),
-    type = "character", default = "/data/work/peanut/DEA/markers_peanut.csv",
-    help = "input the csv of leiden_0.5"
-  ),
-  make_option(c("--minp"),
-    type = "numeric", default = 0.05,
-    help = "filter marker gene limited by min pvalue_adj"
-  ),
-  make_option(c("--species"),
-    type = "character", default = "peanut",
-    help = "differ different species use different database"
-  ),
-  make_option(c("--filepath"),
-    type = "character", default = "/data/work/peanut/enrich/",
-    help = "store all files"
-  )
+  make_option(c("--gene_csv"), type = "character", default = "/data/work/peanut/DEA/markers_peanut.csv", help = "input the csv of leiden_0.5"),
+  make_option(c("--minp"), type = "numeric", default = 0.05, help = "filter marker gene limited by min pvalue_adj"),
+  make_option(c("--species"),type = "character", default = "peanut",help = "differ different species use different database")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 
-filepath <- paste0(opt$filepath, opt$species, "_enrichGO")
+filepath <- paste0(opt$species, "_enrich")
 dir.create(filepath)
 setwd(filepath)
 
-# gene_id, cluster, p_val_adj
-# gene_id == GID
-
-
 markers <- read.csv(opt$gene_csv, header = TRUE, stringsAsFactors = FALSE)
+head(markers) # gene_id, cluster, p_val_adj
 #if (opt$species == "Cer") {markers$gene_id <- sub(".v2.1$", ".1.p", markers$names)}
 #if (opt$species == "Pog") {markers$gene_id <- gsub("_", "-", markers$names)}
-head(markers)
 pathway2gene <- AnnotationDbi::select(org.Ahypogaea.eg.db,keys = keys(org.Ahypogaea.eg.db),columns = c("Pathway","Ko")) %>%
   na.omit() %>%
   dplyr::select(Pathway, GID)
