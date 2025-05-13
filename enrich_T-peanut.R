@@ -4,17 +4,19 @@ library(ggplot2)
 library(tidyverse)
 library(dplyr)
 library(clusterProfiler)
-library(org.Ahypogaea.eg.db)
-length(keys(org.Ahypogaea.eg.db))
+#library(org.Ahypogaea.eg.db)
+#length(keys(org.Ahypogaea.eg.db))
 library(tidyverse)
 library(optparse)
 
 option_list <- list(
   make_option(c("--gene_csv"), type = "character", default = "/data/work/peanut/DEA/markers_peanut.csv", help = "input the csv of leiden_0.5"),
   make_option(c("--minp"), type = "numeric", default = 0.05, help = "filter marker gene limited by min pvalue_adj"),
-  make_option(c("--species"),type = "character", default = "peanut",help = "differ different species use different database")
+  make_option(c("--species"),type = "character", default = "peanut",help = "differ different species use different database"),
+  make_option(c("--db"),type = "character", default = "org.Ahypogaea.eg.db",help = "Name of built db for enrich")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
+do.call(library, list(opt$db)) # 动态加载包
 
 filepath <- paste0(opt$species, "_enrich")
 dir.create(filepath)

@@ -17,26 +17,26 @@ option_list <- list(
     make_option(c("-t", "--tool"), type = "character", default = "FindMarkers", help = "Tools to use"),
     make_option(c("-a", "--assay"), type = "character", default = "RNA", help = "Assay to use"),
     make_option(c("-s", "--slot"), type = "character", default = "data", help = "Slot to use"),
-    make_option(c("-v", "--sample_var"), type = "character", default = "biosample", help = "Sample variable"),
+    make_option(c("-b", "--batch_var"), type = "character", default = "biosample", help = "Batch variable"),
     make_option(c("-g", "--group_var"), type = "character", default = "cell", help = "Group variable"),
     make_option(c("-p", "--min_pct"), type = "numeric", default = 0.01, help = "Minimum percentage"),
     make_option(c("-l", "--log_fc"), type = "numeric", default = 0.1, help = "Log fold change threshold"),
     make_option(c("-n", "--name"), type = "character", default = "peanut", help = "Output name"),
-    make_option(c("-1", "--sample_1"), type = "character", default = "WT", help = "Sample 1"),
-    make_option(c("-2", "--sample_2"), type = "character", default = "Mut", help = "Sample 2")
+    make_option(c("-1", "--batch_1"), type = "character", default = "WT", help = "Batch 1"),
+    make_option(c("-2", "--batch_2"), type = "character", default = "Mut", help = "Batch 2")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 rds <- opt$rds
 tool <- opt$tool
 assay <- opt$assay
 slot <- opt$slot
-sample_var <- opt$sample_var
+sample_var <- opt$batch_var
 group_var <- opt$group_var
 min_pct <- opt$min_pct
 log_fc <- opt$log_fc
 name <- opt$name
-sample_1 <- opt$sample_1
-sample_2 <- opt$sample_2
+sample_1 <- opt$batch_1
+sample_2 <- opt$batch_2
 
 seu <- readRDS(rds)
 tool <- strsplit(tool, ",")[[1]]
