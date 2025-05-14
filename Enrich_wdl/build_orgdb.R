@@ -94,7 +94,7 @@ head(gene2ko)
 # }
 # update_kegg(ko_json)
 load(file = "/script/build_orgdb/kegg_info.RData") # stored in the image GO-R--02
-gene2pathway <- gene2ko  %>% left_join(ko2pathway,by = "Ko") %>% dplyr::select(GID, Pathway) %>% na.omit()
+gene2pathway <- gene2ko %>% left_join(ko2pathway,by = "Ko") %>% dplyr::select(GID, Pathway) %>% na.omit()
 
 # delete duplication
 gene2go <- unique(gene2go)
