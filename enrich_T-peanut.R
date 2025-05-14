@@ -57,7 +57,7 @@ for(i in unique(markers$cluster)){
     dim(kegg_data)
     kegg_data$ONTOLOGY <- "KEGG"
     col_names <- names(kegg_data)
-    kegg_data <- kegg_data[, c("ONTOLOGY", col_names[!col_names %in% "ONTOLOGY"])]}
+    kegg_data <- kegg_data[, c("ONTOLOGY", col_names[!col_names %in% "ONTOLOGY"])]
     data <- rbind(go_data, kegg_data)
     if (nrow(data) > 0) {
         print("Data is not empty. Proceeding with the code.")
