@@ -12,11 +12,20 @@ library(optparse)
 option_list <- list(
   make_option(c("--gene_csv"), type = "character", default = "/data/work/peanut/DEA/markers_peanut.csv", help = "input the csv of leiden_0.5"),
   make_option(c("--minp"), type = "numeric", default = 0.05, help = "filter marker gene limited by min pvalue_adj"),
-  make_option(c("--species"),type = "character", default = "peanut",help = "differ different species use different database"),
-  make_option(c("--db"),type = "character", default = "org.Ahypogaea.eg.db",help = "Name of built db for enrich")
+  make_option(c("--db"),type = "character", default = "org.Ahypogaea.eg.db",help = "Name of built db for enrich"),
+  make_option(c("--genus"), type = "character", default = "Arachis", help = "Genus name", metavar = "character"),
+  make_option(c("--species"), type = "character", default = "hypogaea", help = "Species name", metavar = "character")
 )
 opt <- parse_args(OptionParser(option_list = option_list))
-do.call(library, list(opt$db)) # 动态加载包
+# library
+db_name <- paste0("org.", substr(opt$genus, 1, 1), opt$species, ".eg.db")
+print(db_name)
+#install.packages(paste0(db_name,"/"), repos = NULL, type = "sources")
+install.packages(DB, repos = NULL, type = "sources")
+do.call(library, list(db_name))
+db <- get(db_name)
+columns(db)
+print(head(keys(db, keytype = "GID"), 10))
 
 filepath <- paste0(opt$species, "_enrich")
 dir.create(filepath)
@@ -24,9 +33,7 @@ setwd(filepath)
 
 markers <- read.csv(opt$gene_csv, header = TRUE, stringsAsFactors = FALSE)
 head(markers) # gene_id, cluster, p_val_adj
-#if (opt$species == "Cer") {markers$gene_id <- sub(".v2.1$", ".1.p", markers$names)}
-#if (opt$species == "Pog") {markers$gene_id <- gsub("_", "-", markers$names)}
-pathway2gene <- AnnotationDbi::select(org.Ahypogaea.eg.db,keys = keys(org.Ahypogaea.eg.db),columns = c("Pathway","Ko")) %>%
+pathway2gene <- AnnotationDbi::select(db,keys = keys(db),columns = c("Pathway","Ko")) %>%
   na.omit() %>%
   dplyr::select(Pathway, GID)
 load("/script/build_orgdb/kegg_info.RData")
@@ -36,15 +43,14 @@ for(i in unique(markers$cluster)){
     length(marker_subset$gene_id)
     gene_list <- marker_subset %>% filter(p_val_adj < opt$minp)
     gene_list <- gene_list$gene_id
-    gene_list <- paste0(gene_list, ".1") # gene_id == GID
+    #gene_list <- paste0(gene_list, ".1") # gene_id == GID
     length(gene_list)
     # run enrichGO
     #if (opt$species == "Cer") {
     #data <- enrichGO(gene = gene_list,OrgDb = org.Cthalictroides.eg.db,keyType = 'GID',ont = 'ALL',qvalueCutoff = 0.05,pvalueCutoff = 0.05)}
     #if (opt$species == "Pog") {
     #data <- enrichGO(gene = gene_list,OrgDb = org.Pcirratum.eg.db,keyType = 'GID',ont = 'ALL',qvalueCutoff = 0.05,pvalueCutoff = 0.05)}
-    if (opt$species == "peanut") {
-    go_data <- enrichGO(gene = gene_list,OrgDb = org.Ahypogaea.eg.db,keyType = 'GID',ont = 'ALL',qvalueCutoff = 0.05,pvalueCutoff = 0.05)
+    go_data <- enrichGO(gene = gene_list,OrgDb = db,keyType = 'GID',ont = 'ALL',qvalueCutoff = 0.05,pvalueCutoff = 0.05)
     go_data <- as.data.frame(go_data)
     kegg_result <- enricher(gene_list,TERM2GENE = pathway2gene, TERM2NAME = pathway2name,pvalueCutoff = 0.05,qvalueCutoff = 0.05)
     kegg_data <- as.data.frame(kegg_result)
